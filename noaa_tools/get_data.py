@@ -5,6 +5,7 @@ import gzip
 import io
 import os
 from pathlib import Path
+from typing import List
 from urllib.parse import urljoin, urlparse
 from urllib.request import urlopen
 
@@ -21,13 +22,13 @@ def get_data_ftp(url: str) -> bytes:
         return response.read()
 
 
-def download_data_for_year(year: int, data_path: Path) -> int:
+def download_data_for_year(year: int, data_path: Path) -> Path:
     # downloads the NOAA weather data for the given year
     # returns the number of bytes written to the local FS
     year_filename = f"{year}.csv.gz"
     file_path = Path(data_path, year_filename)
     if file_path.exists():
-        return 0
+        return file_path
 
     year_url = urljoin(base_url, year_filename)
     year_data = get_data_ftp(year_url)
@@ -38,12 +39,12 @@ def download_data_for_year(year: int, data_path: Path) -> int:
             raise ValueError(
                 f"couldn't get data for {year_filename}: got {bytes_written} bytes"
             )
-    return bytes_written
+    return file_path
 
 
 def download_historical_data(
     year_start: int, year_end: int, data_path: Path = Path("data")
-) -> int:
+) -> List[Path]:
     # iterates over the range of year_start and year_end (inclusive)
     # and writes the data to the data path defined in global scope
     # in a real-life application, the output data path wouldn't be hardcoded
@@ -53,13 +54,12 @@ def download_historical_data(
     # which should speed up the download
 
     years = range(year_start, year_end + 1)
-
     data_path.mkdir(exist_ok=True)
-    total_bytes_downloaded = 0
 
     # use tqdm to create a progress bar (NB sometimes doesn't work properly in jupyter)
+    output_paths = []
     for year in tqdm(years):
         tqdm.write(f"getting data for {year}")
-        bytes_written = download_data_for_year(year, data_path)
-        total_bytes_downloaded += bytes_written
-    return total_bytes_downloaded
+        file_path = download_data_for_year(year, data_path)
+        output_paths.append(file_path)
+    return output_paths
