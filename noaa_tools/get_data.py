@@ -1,16 +1,9 @@
 import contextlib
-from datetime import datetime as dt, timedelta
-from functools import partial
-import gzip
-import io
-import os
 from pathlib import Path
 from typing import List
 from urllib.parse import urljoin, urlparse
 from urllib.request import urlopen
 
-from joblib import Parallel, delayed
-import pandas as pd
 from tqdm import tqdm
 
 base_url = "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/"
