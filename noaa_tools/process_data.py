@@ -81,8 +81,8 @@ def get_means_noaa_files(data_files: List[Path] = None) -> pd.DataFrame:
         data_dir = Path("data")
         data_files = [item for item in data_dir.iterdir() if ".csv" in item.suffixes]
 
-    # don't overload the machine -- only use half + 1 of all available CPUs
-    max_cpus = os.cpu_count() // 2 + 1
+    # don't overload the machine -- use at most 2 CPUs
+    max_cpus = min(os.cpu_count(), 2)
     dfs_means = Parallel(n_jobs=max_cpus)(
         delayed(get_means_df_file)(data_file) for data_file in data_files
     )
