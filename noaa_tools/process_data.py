@@ -1,7 +1,7 @@
 from datetime import datetime as dt, timedelta
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 from joblib import Parallel, delayed
 import pandas as pd
@@ -76,8 +76,10 @@ def get_means_df_file(data_file: Path) -> pd.DataFrame:
     return df_means
 
 
-def get_means_all_noaa_files(data_dir: Path = Path("data")) -> pd.DataFrame:
-    data_files = [item for item in data_dir.iterdir() if ".csv" in item.suffixes]
+def get_means_noaa_files(data_files: List[Path] = None) -> pd.DataFrame:
+    if not data_files:
+        data_dir = Path("data")
+        data_files = [item for item in data_dir.iterdir() if ".csv" in item.suffixes]
 
     # don't overload the machine -- only use half + 1 of all available CPUs
     max_cpus = os.cpu_count() // 2 + 1
