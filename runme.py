@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt
+from pathlib import Path
 
 from noaa_tools import get_data, process_data
 
 cur_year = dt.now().year
 
 arg_parser = ArgumentParser()
+arg_parser.add_argument(
+    "--data-dir", type=Path, default=Path("data"), help="path to store the NOAA data"
+)
 arg_parser.add_argument(
     "--year-start",
     type=int,
@@ -31,7 +35,9 @@ args = arg_parser.parse_args()
 
 def main():
     print("Getting the data...")
-    data_paths = get_data.download_historical_data(args.year_start, args.year_end)
+    data_paths = get_data.download_historical_data(
+        year_start=args.year_start, year_end=args.year_end, data_path=args.data_dir
+    )
     print("Computing means for every year")
     df_means_years = process_data.get_means_noaa_files(data_paths)
     for column_name in df_means_years.columns:

@@ -36,7 +36,7 @@ def download_data_for_year(year: int, data_path: Path) -> Path:
 
 
 def download_historical_data(
-    year_start: int, year_end: int, data_path: Path = Path("data")
+    *, year_start: int, year_end: int, data_path: Path = Path("data")
 ) -> List[Path]:
     # iterates over the range of year_start and year_end (inclusive)
     # and writes the data to the data path defined in global scope
