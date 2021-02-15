@@ -20,6 +20,12 @@ arg_parser.add_argument(
     default=cur_year - 1,
     help="last year for which to get the data",
 )
+arg_parser.add_argument(
+    "--top-n-years",
+    type=int,
+    default=5,
+    help="how many years to output for each statistic",
+)
 args = arg_parser.parse_args()
 
 
@@ -28,7 +34,12 @@ def main():
     data_paths = get_data.download_historical_data(args.year_start, args.year_end)
     print("Computing means for every year")
     df_means_years = process_data.get_means_noaa_files(data_paths)
-    print(df_means_years.idxmax())
+    for column_name in df_means_years.columns:
+        sorted_years = df_means_years.sort_values(
+            column_name, ascending=False
+        ).index.tolist()
+        top_sorted_years = sorted_years[: args.top_n_years]
+        print(column_name, top_sorted_years)
 
 
 if __name__ == "__main__":
